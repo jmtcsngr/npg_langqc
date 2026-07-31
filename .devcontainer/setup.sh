@@ -57,8 +57,12 @@ wait_for_tcp qc_db 3307 "QC database"
 # QC database: Alembic builds the schema AND seeds the dictionary tables
 # (seq_platform, qc_type, qc_state_dict, ...) via its migrations. Reads
 # ALEMBIC_DB_URL from the environment (see alembic/env.py). Idempotent.
-echo "==> Applying QC database migrations (alembic upgrade head)"
-poetry run alembic upgrade head
+#
+# Use "heads" (plural), not "head": the migration tree branches at
+# dd60c67ad3e5 into two unmerged heads (23c7eda792e2 and 2.1.0), so the
+# singular "head" target fails with "Multiple head revisions are present".
+echo "==> Applying QC database migrations (alembic upgrade heads)"
+poetry run alembic upgrade heads
 
 # MLWH database: no migrations exist, so create the schema from the ORM.
 echo "==> Creating MLWH schema"
