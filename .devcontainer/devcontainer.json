@@ -19,8 +19,9 @@
   "postCreateCommand": "bash .devcontainer/setup.sh",
 
   // Database ports forwarded so a host DB client (DBeaver, etc.) can connect.
-  "forwardPorts": [3306, 3307],
+  "forwardPorts": [8181, 3306, 3307],
   "portsAttributes": {
+    "8181": { "label": "LangQC API", "onAutoForward": "notify" },
     "3306": { "label": "MLWH MySQL", "onAutoForward": "silent" },
     "3307": { "label": "QC MySQL", "onAutoForward": "silent" }
   },
