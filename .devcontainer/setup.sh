@@ -53,4 +53,15 @@ echo "==> Installing frontend dependencies (npm install)"
 wait_for_tcp mlwh_db 3306 "MLWH database"
 wait_for_tcp qc_db 3307 "QC database"
 
+# --- Database schemas ----------------------------------------------------
+# QC database: Alembic builds the schema AND seeds the dictionary tables
+# (seq_platform, qc_type, qc_state_dict, ...) via its migrations. Reads
+# ALEMBIC_DB_URL from the environment (see alembic/env.py). Idempotent.
+echo "==> Applying QC database migrations (alembic upgrade head)"
+poetry run alembic upgrade head
+
+# MLWH database: no migrations exist, so create the schema from the ORM.
+echo "==> Creating MLWH schema"
+poetry run python .devcontainer/init_mlwh_schema.py
+
 echo "==> Setup complete"
