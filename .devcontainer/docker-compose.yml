@@ -6,7 +6,8 @@
 #   - qc_db     : the LangQC QC database (read-write)                on port 3307
 #   - lang_qc   : the FastAPI backend, hot-reloading, on port 8181
 #   - longue_vue: the Vue/Vite frontend dev server, base /ui/, on port 80
-# The Apache proxy (which routes /api and /ui on one origin) is added next.
+#   - proxy     : Apache (HTTP) routing /api + /ui on one origin, published :8443,
+#                 injecting a dev identity header in place of OIDC
 #
 # Ports mirror tests/testdb.ini (3306 MLWH, 3307 QC) so the same credentials
 # work for pytest. Databases are reachable by service name from inside the
@@ -109,3 +110,20 @@ services:
     # Serves on :80 at base /ui/; published as :8080 on the host.
     ports:
       - "8080:80"
+
+  proxy:
+    # Override the image's SSL vhost with our HTTP-only one (see proxy/000-default.conf).
+    build:
+      context: ../docker/proxy
+      dockerfile: Dockerfile
+      target: development
+    volumes:
+      - ./proxy/000-default.conf:/etc/apache2/sites-enabled/000-default.conf:ro
+    environment:
+      # Dev identity injected as the oidc_claim_email header; matches a seeded QC user.
+      DEV_OIDC_EMAIL: dev@example.com
+    ports:
+      - "8443:80"
+    depends_on:
+      - lang_qc
+      - longue_vue
