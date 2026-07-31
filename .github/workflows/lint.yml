@@ -2,7 +2,7 @@ name: Lint
 
 on:
   push:
-    branches: [master, devel]
+    branches: ['**']   # THROWAWAY: run on all branches to test CI; revert before merge
   pull_request:
     branches: [master, devel]
 
