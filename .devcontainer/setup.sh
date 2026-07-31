@@ -68,4 +68,9 @@ poetry run alembic upgrade heads
 echo "==> Creating MLWH schema"
 poetry run python .devcontainer/init_mlwh_schema.py
 
+# --- Fixtures ------------------------------------------------------------
+# Load a minimal dev dataset (one run, two inbox-ready wells) plus QC users.
+echo "==> Loading dev fixtures"
+poetry run python .devcontainer/load_fixtures.py
+
 echo "==> Setup complete"
