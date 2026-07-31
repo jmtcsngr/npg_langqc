@@ -5,7 +5,8 @@
 #   - mlwh_db   : the multi-LIMS warehouse (read-only upstream data) on port 3306
 #   - qc_db     : the LangQC QC database (read-write)                on port 3307
 #   - lang_qc   : the FastAPI backend, hot-reloading, on port 8181
-# The frontend and Apache proxy are added as sibling services in later steps.
+#   - longue_vue: the Vue/Vite frontend dev server, base /ui/, on port 80
+# The Apache proxy (which routes /api and /ui on one origin) is added next.
 #
 # Ports mirror tests/testdb.ini (3306 MLWH, 3307 QC) so the same credentials
 # work for pytest. Databases are reachable by service name from inside the
@@ -95,3 +96,16 @@ services:
         condition: service_healthy
       qc_db:
         condition: service_healthy
+
+  longue_vue:
+    # frontend/.env must exist before build (see initializeCommand).
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+      target: development
+    volumes:
+      - ../frontend/src:/code/longue_vue/src:cached
+      - ../frontend/public:/code/longue_vue/public:cached
+    # Serves on :80 at base /ui/; published as :8080 on the host.
+    ports:
+      - "8080:80"
