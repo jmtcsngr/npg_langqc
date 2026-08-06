@@ -110,6 +110,14 @@ services:
     # Serves on :80 at base /ui/; published as :8080 on the host.
     ports:
       - "8080:80"
+    healthcheck:
+      # Vite takes ~30-60s to start listening; the proxy gates on this so it
+      # never forwards to a not-yet-ready frontend (avoids transient 502s).
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost/ui/ || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
 
   proxy:
     # Override the image's SSL vhost with our HTTP-only one (see proxy/000-default.conf).
@@ -125,5 +133,7 @@ services:
     ports:
       - "8443:80"
     depends_on:
-      - lang_qc
-      - longue_vue
+      lang_qc:
+        condition: service_started
+      longue_vue:
+        condition: service_healthy
