@@ -20,7 +20,10 @@ echo "==> npg_langqc devcontainer setup"
 wait_for_tcp() {
   local host=$1 port=$2 name=$3
   echo "==> Waiting for ${name} (${host}:${port})"
-  for _ in $(seq 1 60); do
+  # Generous window: a fresh MySQL data-dir init under first-build load can take
+  # a few minutes. Loop exits as soon as the port opens, so this only waits as
+  # long as needed. 180 * 2s = up to 6 minutes.
+  for _ in $(seq 1 180); do
     if (echo > "/dev/tcp/${host}/${port}") >/dev/null 2>&1; then
       echo "    ${name} is accepting connections"
       return 0
