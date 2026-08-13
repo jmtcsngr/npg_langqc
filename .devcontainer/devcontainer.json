@@ -23,9 +23,12 @@
 
   "forwardPorts": [8443, 8080, 8181, 3306, 3307],
   "portsAttributes": {
-    "8443": { "label": "LangQC (app)", "onAutoForward": "notify" },
-    "8080": { "label": "LangQC UI (direct)", "onAutoForward": "silent" },
-    "8181": { "label": "LangQC API (direct)", "onAutoForward": "silent" },
+    // 8443 is the app entry. `protocol: http` is REQUIRED — 8443 is a
+    // conventional HTTPS port, so Codespaces otherwise assumes TLS and 502s
+    // against our plain-HTTP proxy. Auto-open it so the right URL launches.
+    "8443": { "label": "LangQC app (open this)", "onAutoForward": "openBrowser", "protocol": "http" },
+    "8080": { "label": "frontend only (no /api)", "onAutoForward": "silent", "protocol": "http" },
+    "8181": { "label": "backend API only", "onAutoForward": "silent", "protocol": "http" },
     "3306": { "label": "MLWH MySQL", "onAutoForward": "silent" },
     "3307": { "label": "QC MySQL", "onAutoForward": "silent" }
   },

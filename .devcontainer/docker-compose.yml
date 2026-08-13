@@ -121,6 +121,7 @@ services:
       target: development
     volumes:
       - ./proxy/000-default.conf:/etc/apache2/sites-enabled/000-default.conf:ro
+      - ./proxy/index.html:/var/www/html/index.html:ro
     environment:
       # Dev identity injected as the oidc_claim_email header; matches a seeded QC user.
       DEV_OIDC_EMAIL: dev@example.com
